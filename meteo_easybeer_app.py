@@ -3,7 +3,7 @@ import numpy as np
 import requests
 from datetime import datetime
 import streamlit as st
-from streamlit_extras.st_autorefresh import st_autorefresh
+from streamlit_autorefresh import st_autorefresh
 import matplotlib.pyplot as plt
 
 # === Configurazione ===

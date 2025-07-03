@@ -9,7 +9,20 @@ open_meteo_url = "https://api.open-meteo.com/v1/forecast"
 lat_easybeer = 45.44859
 lon_easybeer = 9.16068
 
-# === Funzioni ===
+# === Interfaccia Streamlit ===
+st.set_page_config(page_title="Easy Meteo", layout="centered")
+
+# Logo al posto del titolo
+st.markdown(
+    """
+    <div style='text-align: center;'>
+        <img src='https://github.com/Dagame71/meteo_easybeer/blob/main/Logo_EM.png?raw=true' width='200'>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# === Funzione meteo ===
 def scarica_meteo_openmeteo(lat, lon):
     try:
         params = {

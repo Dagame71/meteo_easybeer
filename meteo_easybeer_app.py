@@ -16,7 +16,7 @@ st.set_page_config(page_title="Easy Meteo", layout="centered")
 st.markdown(
     """
     <div style='text-align: center;'>
-        <img src='https://github.com/Dagame71/meteo_easybeer/blob/main/Logo_EM.png?raw=true' width='200'>
+        <img src='https://github.com/Dagame71/meteo_easybeer/blob/main/Logo_EM.png?raw=true' width='300'>
     </div>
     """,
     unsafe_allow_html=True

@@ -10,7 +10,7 @@ lat_easybeer = 45.44859
 lon_easybeer = 9.16068
 
 # === Interfaccia Streamlit ===
-st.set_page_config(page_title="Easy Meteo", layout="centered")
+
 
 # Logo al posto del titolo
 st.markdown(

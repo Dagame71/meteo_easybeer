@@ -10,7 +10,7 @@ lat_easybeer = 45.44859
 lon_easybeer = 9.16068
 
 # === Interfaccia Streamlit ===
-
+st.set_page_config(page_title="Easy Meteo", layout="centered")
 
 # Logo al posto del titolo
 st.markdown(
@@ -39,10 +39,7 @@ def scarica_meteo_openmeteo(lat, lon):
         st.error(f"Errore meteo Open-Meteo: {e}")
         return None
 
-# === Interfaccia Streamlit ===
-st.set_page_config(page_title="Easy Meteo", layout="centered")
-st.markdown("<h1 style='text-align: center;'>Easy Meteo</h1>", unsafe_allow_html=True)
-
+# === Recupero dati meteo ===
 openmeteo = scarica_meteo_openmeteo(lat_easybeer, lon_easybeer)
 
 if openmeteo:
@@ -91,4 +88,3 @@ if openmeteo:
 
 else:
     st.error("Dati meteo non disponibili.")
-

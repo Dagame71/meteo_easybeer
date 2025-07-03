@@ -65,7 +65,7 @@ if openmeteo and "current_weather" in openmeteo:
         icona = "☁️"
         descr_nuvole = "Nuvoloso"
 
-    # Trovo la precipitazione e l'umidità corrispondenti all'orario attuale
+    # Trovo la precipitazione e l'umidità dell'orario più vicino
     df_orario = pd.DataFrame({
         "time": pd.to_datetime(openmeteo["hourly"]["time"]),
         "precip": openmeteo["hourly"]["precipitation"],
@@ -73,11 +73,10 @@ if openmeteo and "current_weather" in openmeteo:
     })
 
     ora_attuale = pd.to_datetime(meteo_attuale["time"])
-    precip_attuale = df_orario.loc[df_orario["time"] == ora_attuale, "precip"].values
-    umidita_attuale = df_orario.loc[df_orario["time"] == ora_attuale, "humidity"].values
+    indice_piu_vicino = (df_orario["time"] - ora_attuale).abs().idxmin()
 
-    precip_attuale = precip_attuale[0] if len(precip_attuale) > 0 else 0
-    umidita_attuale = umidita_attuale[0] if len(umidita_attuale) > 0 else 0
+    precip_attuale = df_orario.loc[indice_piu_vicino, "precip"]
+    umidita_attuale = df_orario.loc[indice_piu_vicino, "humidity"]
 
     # Mostra solo se c'è pioggia
     if precip_attuale > 0:
@@ -184,6 +183,7 @@ if openmeteo:
 
 else:
     st.error("Dati meteo non disponibili.")
+
 
 
 

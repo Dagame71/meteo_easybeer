@@ -109,7 +109,19 @@ if openmeteo:
 
     giorni = df["day"].unique()
 
-    descrizione_nuvole = lambda x: "Sereno" if x < 20 else "Poco nuvoloso" if x < 50 else "Molto nuvoloso"
+    # Nuova classificazione delle nuvole
+    def descrizione_nuvole(x):
+        if x <= 10:
+            return "Sereno"
+        elif x <= 30:
+            return "Quasi sereno"
+        elif x <= 60:
+            return "Poco nuvoloso"
+        elif x <= 90:
+            return "Molto nuvoloso"
+        else:
+            return "Cielo coperto"
+
     descrizione_precip = lambda x: f"{x:.1f} mm di pioggia" if x > 0 else ""
 
     oggi = datetime.now().date()
@@ -166,10 +178,14 @@ if openmeteo:
 
                 # Mostra previsioni con icone ed emoji, inclusa l'umidità
                 for _, row in df_giorno.iterrows():
-                    if row["cloud"] < 20:
+                    if row["cloud"] <= 10:
                         icona = "☀️"
-                    elif row["cloud"] < 50:
+                    elif row["cloud"] <= 30:
                         icona = "⛅"
+                    elif row["cloud"] <= 60:
+                        icona = "⛅"
+                    elif row["cloud"] <= 90:
+                        icona = "☁️"
                     else:
                         icona = "☁️"
 
@@ -185,6 +201,7 @@ if openmeteo:
 
 else:
     st.error("Dati meteo non disponibili.")
+
 
 
 

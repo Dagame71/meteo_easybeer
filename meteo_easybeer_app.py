@@ -65,11 +65,12 @@ if openmeteo and "current_weather" in openmeteo:
         icona = "☁️"
         descr_nuvole = "Nuvoloso"
 
-    # Trovo la precipitazione e l'umidità dell'orario più vicino
+    # Trovo la precipitazione, l'umidità e il vento dell'orario più vicino
     df_orario = pd.DataFrame({
         "time": pd.to_datetime(openmeteo["hourly"]["time"]),
         "precip": openmeteo["hourly"]["precipitation"],
-        "humidity": openmeteo["hourly"]["relativehumidity_2m"]
+        "humidity": openmeteo["hourly"]["relativehumidity_2m"],
+        "wind": openmeteo["hourly"]["windspeed_10m"]
     })
 
     ora_attuale = pd.to_datetime(meteo_attuale["time"])
@@ -77,6 +78,7 @@ if openmeteo and "current_weather" in openmeteo:
 
     precip_attuale = df_orario.loc[indice_piu_vicino, "precip"]
     umidita_attuale = df_orario.loc[indice_piu_vicino, "humidity"]
+    vento_attuale = df_orario.loc[indice_piu_vicino, "wind"]
 
     # Mostra solo se c'è pioggia
     if precip_attuale > 0:
@@ -87,7 +89,7 @@ if openmeteo and "current_weather" in openmeteo:
     st.markdown(
         f"""
         <div style='text-align: center; padding: 10px; background-color: #f0f0f0; border-radius: 10px; margin-bottom: 20px;'>
-            <b>{icona} {temp_attuale:.1f}°C - {descr_nuvole} - 💦 {umidita_attuale:.0f}%{pioggia}</b>
+            <b>{icona} {temp_attuale:.1f}°C - {descr_nuvole} - 💦 {umidita_attuale:.0f}% - 💨 {vento_attuale:.1f} km/h{pioggia}</b>
         </div>
         """,
         unsafe_allow_html=True
@@ -149,9 +151,9 @@ if openmeteo:
                 st.markdown(
                     """
                     <div style='text-align: center; margin-bottom: 10px;'>
-                        <span style='color:blue;'>⬤ Temperatura </span> &nbsp;&nbsp;
-                        <span style='color:gray;'>⬤ Nuvolosità </span> &nbsp;&nbsp;
-                        <span style='color:orange;'>⬤ Vento </span>
+                        <span style='color:blue;'>⬤ Temperatura (°C)</span> &nbsp;&nbsp;
+                        <span style='color:gray;'>⬤ Nuvolosità (%)</span> &nbsp;&nbsp;
+                        <span style='color:orange;'>⬤ Vento (km/h)</span>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -189,7 +191,7 @@ if openmeteo:
 
                     descr_nuvole = descrizione_nuvole(row["cloud"])
 
-                    stringa = f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💦 {row['humidity']:.0f}%"
+                    stringa = f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💦 {row['humidity']:.0f}% - 💨 {row['wind']:.1f} km/h"
 
                     # Scala icone pioggia
                     pioggia = row["precip"]

@@ -65,8 +65,17 @@ if openmeteo and "current_weather" in openmeteo:
         icona = "☁️"
         descr_nuvole = "Nuvoloso"
 
-    # Precipitazione stimata dal primo dato orario
-    precip_attuale = openmeteo["hourly"]["precipitation"][0] if "precipitation" in openmeteo["hourly"] else 0
+    # Trovo la precipitazione corrispondente all'orario attuale
+    df_orario = pd.DataFrame({
+        "time": pd.to_datetime(openmeteo["hourly"]["time"]),
+        "precip": openmeteo["hourly"]["precipitation"]
+    })
+
+    ora_attuale = pd.to_datetime(meteo_attuale["time"])
+    precip_attuale = df_orario.loc[df_orario["time"] == ora_attuale, "precip"].values
+    precip_attuale = precip_attuale[0] if len(precip_attuale) > 0 else 0
+
+    # Mostra solo se c'è pioggia
     if precip_attuale > 0:
         pioggia = f" - 💧 {precip_attuale:.1f} mm di pioggia"
     else:
@@ -149,5 +158,6 @@ if openmeteo:
 
 else:
     st.error("Dati meteo non disponibili.")
+
 
 

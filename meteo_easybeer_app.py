@@ -139,9 +139,9 @@ if openmeteo:
                 st.markdown(
                     """
                     <div style='text-align: center; margin-bottom: 10px;'>
-                        <span style='color:blue;'>⬤ Temperatura </span> &nbsp;&nbsp;
-                        <span style='color:gray;'>⬤ Nuvolosità </span> &nbsp;&nbsp;
-                        <span style='color:orange;'>⬤ Vento </span>
+                        <span style='color:blue;'>⬤ Temperatura (°C)</span> &nbsp;&nbsp;
+                        <span style='color:gray;'>⬤ Nuvolosità (%)</span> &nbsp;&nbsp;
+                        <span style='color:orange;'>⬤ Vento (km/h)</span>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -164,7 +164,7 @@ if openmeteo:
 
                 st.pyplot(fig)
 
-                # Mostra previsioni con icone ed emoji
+                # Mostra previsioni con icone ed emoji, inclusa l'umidità
                 for _, row in df_giorno.iterrows():
                     if row["cloud"] < 20:
                         icona = "☀️"
@@ -176,13 +176,16 @@ if openmeteo:
                     descr_nuvole = descrizione_nuvole(row["cloud"])
                     descr_precip = descrizione_precip(row["precip"])
 
+                    stringa = f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💦 {row['humidity']:.0f}%"
+
                     if row["precip"] > 0:
-                        st.write(f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💧 {descr_precip}")
-                    else:
-                        st.write(f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole}")
+                        stringa += f" - 💧 {descr_precip}"
+
+                    st.write(stringa)
 
 else:
     st.error("Dati meteo non disponibili.")
+
 
 
 

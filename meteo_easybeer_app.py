@@ -3,6 +3,7 @@ import numpy as np
 import requests
 from datetime import datetime
 import streamlit as st
+from streamlit_extras.st_autorefresh import st_autorefresh
 
 # === Configurazione ===
 open_meteo_url = "https://api.open-meteo.com/v1/forecast"
@@ -21,6 +22,9 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+# 🔄 Aggiornamento automatico ogni 5 minuti
+st_autorefresh(interval=300000, key="meteo-refresh")
 
 # === Funzione meteo ===
 def scarica_meteo_openmeteo(lat, lon):

@@ -28,8 +28,8 @@ def scarica_meteo_openmeteo(lat, lon):
         return None
 
 # === Interfaccia Streamlit ===
-st.set_page_config(page_title="Meteo Easy Beer Milano", layout="centered")
-st.title("Meteo Easy Beer Milano - Previsioni Testuali")
+st.set_page_config(page_title="Easy Meteo", layout="centered")
+st.title("Easy Meteo")
 
 openmeteo = scarica_meteo_openmeteo(lat_easybeer, lon_easybeer)
 

@@ -122,8 +122,6 @@ if openmeteo:
         else:
             return "Cielo coperto"
 
-    descrizione_precip = lambda x: f"{x:.1f} mm di pioggia" if x > 0 else ""
-
     oggi = datetime.now().date()
     ora_attuale = datetime.now()
 
@@ -176,7 +174,7 @@ if openmeteo:
 
                 st.pyplot(fig)
 
-                # Mostra previsioni con icone ed emoji, inclusa l'umidità
+                # Mostra previsioni con icone ed emoji, inclusa l'umidità e pioggia con scala iconica
                 for _, row in df_giorno.iterrows():
                     if row["cloud"] <= 10:
                         icona = "☀️"
@@ -190,23 +188,24 @@ if openmeteo:
                         icona = "☁️"
 
                     descr_nuvole = descrizione_nuvole(row["cloud"])
-                    descr_precip = descrizione_precip(row["precip"])
 
                     stringa = f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💦 {row['humidity']:.0f}%"
 
-                    if row["precip"] > 0:
-                        stringa += f" - 💧 {descr_precip}"
+                    # Scala icone pioggia
+                    pioggia = row["precip"]
+                    if pioggia > 0:
+                        if pioggia <= 0.5:
+                            icona_pioggia = "💧"
+                        elif pioggia <= 2:
+                            icona_pioggia = "💧💧"
+                        elif pioggia <= 5:
+                            icona_pioggia = "🌧"
+                        else:
+                            icona_pioggia = "⛈"
+
+                        stringa += f" - {icona_pioggia} {pioggia:.1f} mm"
 
                     st.write(stringa)
 
 else:
     st.error("Dati meteo non disponibili.")
-
-
-
-
-
-
-
-
-

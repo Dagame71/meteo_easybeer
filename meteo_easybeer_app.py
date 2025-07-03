@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 import streamlit as st
 from streamlit_extras.st_autorefresh import st_autorefresh
+import matplotlib.pyplot as plt
 
 # === Configurazione ===
 open_meteo_url = "https://api.open-meteo.com/v1/forecast"
@@ -85,10 +86,31 @@ if openmeteo:
             if df_giorno.empty:
                 st.write("Nessuna previsione disponibile per le prossime ore.")
             else:
+                # Mostra grafico della temperatura
+                st.write("Andamento temperatura:")
+                plt.figure()
+                plt.plot(df_giorno["hour"], df_giorno["temp"], marker="o")
+                plt.title("Temperatura oraria")
+                plt.ylabel("°C")
+                plt.xticks(rotation=45)
+                st.pyplot(plt)
+
+                # Mostra previsioni con icone ed emoji
                 for _, row in df_giorno.iterrows():
+                    if row["cloud"] < 20:
+                        icona = "☀️"
+                    elif row["cloud"] < 50:
+                        icona = "⛅"
+                    else:
+                        icona = "☁️"
+
                     descr_nuvole = descrizione_nuvole(row["cloud"])
                     descr_precip = descrizione_precip(row["precip"])
-                    st.write(f"{row['hour']} - {row['temp']:.1f}°C - {descr_nuvole} - {descr_precip}")
+
+                    pioggia_emoji = "💧" if row["precip"] > 0 else ""
+
+                    st.write(f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - {pioggia_emoji} {descr_precip}")
 
 else:
     st.error("Dati meteo non disponibili.")
+

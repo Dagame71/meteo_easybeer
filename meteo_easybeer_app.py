@@ -61,7 +61,7 @@ if openmeteo:
     giorni = df["day"].unique()
 
     descrizione_nuvole = lambda x: "Sereno" if x < 20 else "Poco nuvoloso" if x < 50 else "Molto nuvoloso"
-    descrizione_precip = lambda x: "No precipitazioni" if x == 0 else f"{x:.1f} mm di pioggia"
+    descrizione_precip = lambda x: f"{x:.1f} mm di pioggia" if x > 0 else ""
 
     oggi = datetime.now().date()
     ora_attuale = datetime.now()
@@ -107,11 +107,11 @@ if openmeteo:
                     descr_nuvole = descrizione_nuvole(row["cloud"])
                     descr_precip = descrizione_precip(row["precip"])
 
-                    pioggia_emoji = "💧" if row["precip"] > 0 else ""
-
-                    st.write(f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - {pioggia_emoji} {descr_precip}")
+                    if row["precip"] > 0:
+                        st.write(f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💧 {descr_precip}")
+                    else:
+                        st.write(f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole}")
 
 else:
     st.error("Dati meteo non disponibili.")
 
-# Modifica fittizia per forzare rebuild

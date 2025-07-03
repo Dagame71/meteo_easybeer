@@ -139,9 +139,9 @@ if openmeteo:
                 st.markdown(
                     """
                     <div style='text-align: center; margin-bottom: 10px;'>
-                        <span style='color:blue;'>⬤ Temperatura (°C)</span> &nbsp;&nbsp;
-                        <span style='color:gray;'>⬤ Nuvolosità (%)</span> &nbsp;&nbsp;
-                        <span style='color:orange;'>⬤ Vento (km/h)</span>
+                        <span style='color:blue;'>⬤ Temperatura </span> &nbsp;&nbsp;
+                        <span style='color:gray;'>⬤ Nuvolosità </span> &nbsp;&nbsp;
+                        <span style='color:orange;'>⬤ Vento </span>
                     </div>
                     """,
                     unsafe_allow_html=True

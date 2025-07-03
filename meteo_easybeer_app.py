@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import requests
@@ -49,8 +48,19 @@ if openmeteo:
     descrizione_nuvole = lambda x: "Sereno" if x < 20 else "Poco nuvoloso" if x < 50 else "Molto nuvoloso"
     descrizione_precip = lambda x: "No precipitazioni" if x == 0 else f"{x:.1f} mm di pioggia"
 
+    oggi = datetime.now().date()
+
     for giorno in giorni:
-        with st.expander(f"Previsioni per il {giorno}"):
+        if giorno == oggi:
+            label = "Oggi"
+        elif giorno == oggi + pd.Timedelta(days=1):
+            label = "Domani"
+        elif giorno == oggi + pd.Timedelta(days=2):
+            label = "Dopodomani"
+        else:
+            label = giorno.strftime("%d/%m/%Y")
+
+        with st.expander(f"Previsioni per {label}"):
             df_giorno = df[df["day"] == giorno]
 
             for _, row in df_giorno.iterrows():

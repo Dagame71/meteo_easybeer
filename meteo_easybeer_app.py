@@ -33,7 +33,7 @@ def scarica_meteo_openmeteo(lat, lon):
         params = {
             "latitude": lat,
             "longitude": lon,
-            "hourly": ["temperature_2m", "precipitation", "cloudcover", "windspeed_10m"],
+            "hourly": ["temperature_2m", "precipitation", "cloudcover", "windspeed_10m", "relativehumidity_2m"],
             "forecast_days": 3,
             "current_weather": True,
             "timezone": "auto"
@@ -65,15 +65,19 @@ if openmeteo and "current_weather" in openmeteo:
         icona = "☁️"
         descr_nuvole = "Nuvoloso"
 
-    # Trovo la precipitazione corrispondente all'orario attuale
+    # Trovo la precipitazione e l'umidità corrispondenti all'orario attuale
     df_orario = pd.DataFrame({
         "time": pd.to_datetime(openmeteo["hourly"]["time"]),
-        "precip": openmeteo["hourly"]["precipitation"]
+        "precip": openmeteo["hourly"]["precipitation"],
+        "humidity": openmeteo["hourly"]["relativehumidity_2m"]
     })
 
     ora_attuale = pd.to_datetime(meteo_attuale["time"])
     precip_attuale = df_orario.loc[df_orario["time"] == ora_attuale, "precip"].values
+    umidita_attuale = df_orario.loc[df_orario["time"] == ora_attuale, "humidity"].values
+
     precip_attuale = precip_attuale[0] if len(precip_attuale) > 0 else 0
+    umidita_attuale = umidita_attuale[0] if len(umidita_attuale) > 0 else 0
 
     # Mostra solo se c'è pioggia
     if precip_attuale > 0:
@@ -84,7 +88,7 @@ if openmeteo and "current_weather" in openmeteo:
     st.markdown(
         f"""
         <div style='text-align: center; padding: 10px; background-color: #f0f0f0; border-radius: 10px; margin-bottom: 20px;'>
-            <b>{icona} {temp_attuale:.1f}°C - {descr_nuvole}{pioggia}</b>
+            <b>{icona} {temp_attuale:.1f}°C - {descr_nuvole} - 💦 {umidita_attuale:.0f}%{pioggia}</b>
         </div>
         """,
         unsafe_allow_html=True
@@ -97,7 +101,8 @@ if openmeteo:
         "temp": openmeteo["hourly"]["temperature_2m"],
         "precip": openmeteo["hourly"]["precipitation"],
         "cloud": openmeteo["hourly"]["cloudcover"],
-        "wind": openmeteo["hourly"]["windspeed_10m"]
+        "wind": openmeteo["hourly"]["windspeed_10m"],
+        "humidity": openmeteo["hourly"]["relativehumidity_2m"]
     })
 
     df["day"] = df["time"].dt.date
@@ -135,9 +140,9 @@ if openmeteo:
                 st.markdown(
                     """
                     <div style='text-align: center; margin-bottom: 10px;'>
-                        <span style='color:blue;'>⬤ Temperatura </span> &nbsp;&nbsp;
-                        <span style='color:gray;'>⬤ Nuvolosità </span> &nbsp;&nbsp;
-                        <span style='color:orange;'>⬤ Vento </span>
+                        <span style='color:blue;'>⬤ Temperatura (°C)</span> &nbsp;&nbsp;
+                        <span style='color:gray;'>⬤ Nuvolosità (%)</span> &nbsp;&nbsp;
+                        <span style='color:orange;'>⬤ Vento (km/h)</span>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -179,6 +184,7 @@ if openmeteo:
 
 else:
     st.error("Dati meteo non disponibili.")
+
 
 
 

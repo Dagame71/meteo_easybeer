@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 # === Configurazione ===
 open_meteo_url = "https://api.open-meteo.com/v1/forecast"
-openaq_url = "https://api.openaq.org/v2/latest"
 lat_easybeer = 45.44859
 lon_easybeer = 9.16068
 
@@ -28,7 +27,7 @@ st.markdown(
 # 🔄 Aggiornamento automatico ogni 5 minuti
 st_autorefresh(interval=300000, key="meteo-refresh")
 
-# === Funzioni ===
+# === Funzione meteo ===
 def scarica_meteo_openmeteo(lat, lon):
     try:
         params = {
@@ -46,38 +45,8 @@ def scarica_meteo_openmeteo(lat, lon):
         st.error(f"Errore meteo Open-Meteo: {e}")
         return None
 
-def scarica_qualita_aria(lat, lon):
-    try:
-        params = {
-            "coordinates": f"{lat},{lon}",
-            "radius": 5000,  # entro 5 km
-            "parameter": "pm25",
-            "limit": 1
-        }
-        resp = requests.get(openaq_url, params=params)
-        resp.raise_for_status()
-        dati = resp.json()
-        if dati["results"]:
-            return dati["results"][0]["measurements"][0]["value"]
-        else:
-            return None
-    except Exception as e:
-        st.error(f"Errore qualità dell'aria OpenAQ: {e}")
-        return None
-
-def interpreta_qualita_aria(pm25):
-    if pm25 <= 12:
-        return "🟢 Aria buona"
-    elif pm25 <= 35:
-        return "🟡 Moderata"
-    elif pm25 <= 55:
-        return "🟠 Scarsa"
-    else:
-        return "🔴 Pessima"
-
 # === Recupero dati meteo ===
 openmeteo = scarica_meteo_openmeteo(lat_easybeer, lon_easybeer)
-qualita_aria = scarica_qualita_aria(lat_easybeer, lon_easybeer)
 
 # === Striscia meteo attuale sotto il logo ===
 if openmeteo and "current_weather" in openmeteo:
@@ -117,16 +86,10 @@ if openmeteo and "current_weather" in openmeteo:
     else:
         pioggia = ""
 
-    # Qualità aria
-    if qualita_aria is not None:
-        aria = f" - {interpreta_qualita_aria(qualita_aria)}"
-    else:
-        aria = ""
-
     st.markdown(
         f"""
         <div style='text-align: center; padding: 10px; background-color: #f0f0f0; border-radius: 10px; margin-bottom: 20px;'>
-            <b>{icona} {temp_attuale:.1f}°C - {descr_nuvole} - 💦 {umidita_attuale:.0f}% - 💨 {vento_attuale:.1f} km/h{pioggia}{aria}</b>
+            <b>{icona} {temp_attuale:.1f}°C - {descr_nuvole} - 💦 {umidita_attuale:.0f}% - 💨 {vento_attuale:.1f} km/h{pioggia}</b>
         </div>
         """,
         unsafe_allow_html=True
@@ -148,6 +111,7 @@ if openmeteo:
 
     giorni = df["day"].unique()
 
+    # Nuova classificazione delle nuvole
     def descrizione_nuvole(x):
         if x <= 10:
             return "Sereno"
@@ -176,12 +140,14 @@ if openmeteo:
         with st.expander(f"Previsioni per {label}"):
             df_giorno = df[df["day"] == giorno]
 
+            # Se è oggi, mostra solo le previsioni future rispetto all'ora attuale
             if giorno == oggi:
                 df_giorno = df_giorno[df_giorno["time"] >= ora_attuale]
 
             if df_giorno.empty:
                 st.write("Nessuna previsione disponibile per le prossime ore.")
             else:
+                # Legenda fuori dal grafico
                 st.markdown(
                     """
                     <div style='text-align: center; margin-bottom: 10px;'>
@@ -195,11 +161,13 @@ if openmeteo:
 
                 fig, ax1 = plt.subplots()
 
+                # Temperatura (asse sinistro)
                 ax1.plot(df_giorno["hour"], df_giorno["temp"], marker="o", color="blue")
                 ax1.set_ylabel("Temperatura (°C)")
                 ax1.set_xlabel("Ora")
                 ax1.tick_params(axis="x", rotation=45)
 
+                # Nuvolosità e Vento (asse destro)
                 ax2 = ax1.twinx()
                 ax2.plot(df_giorno["hour"], df_giorno["cloud"], color="gray", linestyle="--")
                 ax2.plot(df_giorno["hour"], df_giorno["wind"], color="orange", linestyle=":")
@@ -208,6 +176,7 @@ if openmeteo:
 
                 st.pyplot(fig)
 
+                # Mostra previsioni con icone ed emoji, inclusa l'umidità e pioggia con scala iconica
                 for _, row in df_giorno.iterrows():
                     if row["cloud"] <= 10:
                         icona = "☀️"
@@ -221,8 +190,10 @@ if openmeteo:
                         icona = "☁️"
 
                     descr_nuvole = descrizione_nuvole(row["cloud"])
+
                     stringa = f"{row['hour']} - {row['temp']:.1f}°C - {icona} {descr_nuvole} - 💦 {row['humidity']:.0f}% - 💨 {row['wind']:.1f} km/h"
 
+                    # Scala icone pioggia
                     pioggia = row["precip"]
                     if pioggia > 0:
                         if pioggia <= 0.5:
@@ -233,6 +204,7 @@ if openmeteo:
                             icona_pioggia = "🌧"
                         else:
                             icona_pioggia = "⛈"
+
                         stringa += f" - {icona_pioggia} {pioggia:.1f} mm"
 
                     st.write(stringa)

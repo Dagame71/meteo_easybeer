@@ -28,7 +28,8 @@ def scarica_meteo_openmeteo(lat, lon):
 
 # === Interfaccia Streamlit ===
 st.set_page_config(page_title="Easy Meteo", layout="centered")
-st.title("Easy Meteo")
+st.set_page_config(page_title="Easy Meteo", layout="centered")
+st.markdown("<h1 style='text-align: center;'>Easy Meteo</h1>", unsafe_allow_html=True)
 
 openmeteo = scarica_meteo_openmeteo(lat_easybeer, lon_easybeer)
 

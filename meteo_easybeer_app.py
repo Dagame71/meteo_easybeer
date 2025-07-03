@@ -33,7 +33,7 @@ def scarica_meteo_openmeteo(lat, lon):
         params = {
             "latitude": lat,
             "longitude": lon,
-            "hourly": ["temperature_2m", "precipitation", "cloudcover"],
+            "hourly": ["temperature_2m", "precipitation", "cloudcover", "windspeed_10m"],
             "forecast_days": 3,
             "current_weather": True,
             "timezone": "auto"
@@ -96,7 +96,8 @@ if openmeteo:
         "time": pd.to_datetime(openmeteo["hourly"]["time"]),
         "temp": openmeteo["hourly"]["temperature_2m"],
         "precip": openmeteo["hourly"]["precipitation"],
-        "cloud": openmeteo["hourly"]["cloudcover"]
+        "cloud": openmeteo["hourly"]["cloudcover"],
+        "wind": openmeteo["hourly"]["windspeed_10m"]
     })
 
     df["day"] = df["time"].dt.date
@@ -130,14 +131,28 @@ if openmeteo:
             if df_giorno.empty:
                 st.write("Nessuna previsione disponibile per le prossime ore.")
             else:
-                # Mostra grafico della temperatura
-                st.write("Andamento temperatura:")
-                plt.figure()
-                plt.plot(df_giorno["hour"], df_giorno["temp"], marker="o")
-                plt.title("Temperatura oraria")
-                plt.ylabel("°C")
-                plt.xticks(rotation=45)
-                st.pyplot(plt)
+                st.write("Andamento temperatura, vento e nuvolosità:")
+
+                fig, ax1 = plt.subplots()
+
+                # Temperatura (asse sinistro)
+                ax1.plot(df_giorno["hour"], df_giorno["temp"], marker="o", label="Temperatura (°C)")
+                ax1.set_ylabel("Temperatura (°C)")
+                ax1.set_xlabel("Ora")
+                ax1.tick_params(axis="x", rotation=45)
+
+                # Nuvolosità e Vento (asse destro)
+                ax2 = ax1.twinx()
+                ax2.plot(df_giorno["hour"], df_giorno["cloud"], color="gray", linestyle="--", label="Nuvolosità (%)")
+                ax2.plot(df_giorno["hour"], df_giorno["wind"], color="orange", linestyle=":", label="Vento (km/h)")
+                ax2.set_ylabel("Nuvolosità (%) / Vento (km/h)")
+
+                # Legende
+                lines_1, labels_1 = ax1.get_legend_handles_labels()
+                lines_2, labels_2 = ax2.get_legend_handles_labels()
+                ax1.legend(lines_1 + lines_2, labels_1 + labels_2, loc="upper left")
+
+                st.pyplot(fig)
 
                 # Mostra previsioni con icone ed emoji
                 for _, row in df_giorno.iterrows():
@@ -158,6 +173,7 @@ if openmeteo:
 
 else:
     st.error("Dati meteo non disponibili.")
+
 
 
 

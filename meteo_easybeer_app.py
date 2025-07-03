@@ -114,3 +114,4 @@ if openmeteo:
 else:
     st.error("Dati meteo non disponibili.")
 
+# Modifica fittizia per forzare rebuild

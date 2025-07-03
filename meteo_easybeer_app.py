@@ -28,7 +28,6 @@ def scarica_meteo_openmeteo(lat, lon):
 
 # === Interfaccia Streamlit ===
 st.set_page_config(page_title="Easy Meteo", layout="centered")
-st.set_page_config(page_title="Easy Meteo", layout="centered")
 st.markdown("<h1 style='text-align: center;'>Easy Meteo</h1>", unsafe_allow_html=True)
 
 openmeteo = scarica_meteo_openmeteo(lat_easybeer, lon_easybeer)
@@ -50,6 +49,7 @@ if openmeteo:
     descrizione_precip = lambda x: "No precipitazioni" if x == 0 else f"{x:.1f} mm di pioggia"
 
     oggi = datetime.now().date()
+    ora_attuale = datetime.now()
 
     for giorno in giorni:
         if giorno == oggi:
@@ -64,9 +64,17 @@ if openmeteo:
         with st.expander(f"Previsioni per {label}"):
             df_giorno = df[df["day"] == giorno]
 
-            for _, row in df_giorno.iterrows():
-                descr_nuvole = descrizione_nuvole(row["cloud"])
-                descr_precip = descrizione_precip(row["precip"])
-                st.write(f"{row['hour']} - {row['temp']:.1f}°C - {descr_nuvole} - {descr_precip}")
+            # Se è oggi, mostra solo le previsioni future rispetto all'ora attuale
+            if giorno == oggi:
+                df_giorno = df_giorno[df_giorno["time"] >= ora_attuale]
+
+            if df_giorno.empty:
+                st.write("Nessuna previsione disponibile per le prossime ore.")
+            else:
+                for _, row in df_giorno.iterrows():
+                    descr_nuvole = descrizione_nuvole(row["cloud"])
+                    descr_precip = descrizione_precip(row["precip"])
+                    st.write(f"{row['hour']} - {row['temp']:.1f}°C - {descr_nuvole} - {descr_precip}")
+
 else:
     st.error("Dati meteo non disponibili.")
